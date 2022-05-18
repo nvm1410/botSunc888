@@ -35,6 +35,7 @@ class _TestBackgroundServiceState extends State<TestBackgroundService> {
                   children: [
                     Text(device ?? 'Unknown'),
                     Text(date.toString()),
+                    Text('${data["count"]}')
                   ],
                 );
               },
