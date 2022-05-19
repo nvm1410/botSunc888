@@ -3,6 +3,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:bot_sunc_888/services/media_stream_service.dart';
+import 'package:bot_sunc_888/services/text_recognition_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_overlay_window/flutter_overlay_window.dart';
 import 'package:rive/rive.dart';
@@ -13,9 +14,16 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  TextRecognitionService textRecognitionService = TextRecognitionService();
   ByteBuffer? bytes;
   int count = 0;
   Timer? _timer;
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    textRecognitionService.dispose();
+  }
   @override
   void initState() {
     // TODO: implement initState
@@ -30,15 +38,14 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Column(
         children: [
-          SizedBox(width: 300, height: 300, child: RiveAnimation.asset('assets/bluebot.riv', )),
-          // Center(
-          //     child: bytes == null
-          //         ? Container(
-          //       width: 300,
-          //       height: 400,
-          //       color: Colors.blue)
-          //         : Image.memory(bytes!.asUint8List(), width: 300, height: 400,)
-          // ),
+          Center(
+              child: bytes == null
+                  ? Container(
+                width: 300,
+                height: 400,
+                color: Colors.blue)
+                  : Image.memory(bytes!.asUint8List(), width: 300, height: 400,)
+          ),
           TextButton(
             onPressed: () async {
               ScreenService.record();
@@ -46,11 +53,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 setState(() {
                   count++;
                 });
-                if(count%5==0){
+                if(count%7==0){
                   bytes = await ScreenService.getFrames();
-                  setState(() {
-                    bytes;
-                  });
+                  if(bytes!.lengthInBytes!=0){
+                    textRecognitionService.processImage(bytes!);
+                    setState(() {
+                      bytes;
+                    });
+                  }
                 }
               });
             },
