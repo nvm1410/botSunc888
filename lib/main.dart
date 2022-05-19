@@ -1,16 +1,20 @@
-import 'package:bot_sunc_888/services/background_service.dart';
-import 'package:bot_sunc_888/services/media_stream_service.dart';
-import 'package:bot_sunc_888/test_background_service.dart';
+import 'package:bot_sunc_888/screens/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_overlay_window/flutter_overlay_window.dart';
+import 'package:rive/rive.dart';
 
-// void main() {
-//   runApp(const MyApp());
-// }
 Future<void> main() async {
-  // WidgetsFlutterBinding.ensureInitialized();
-  // await BackgroundService.initializeService();
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
+@pragma("vm:entry-point")
+void overlayMain() {
+  runApp(const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: MyOverlaContent()
+  ));
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -22,38 +26,35 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: HomeScreen(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-  final String title;
+class MyOverlaContent extends StatefulWidget {
+  const MyOverlaContent({ Key? key }) : super(key: key);
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MyOverlaContent> createState() => _MyOverlaContentState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyOverlaContentState extends State<MyOverlaContent> {
+  String _dataFromApp = "Hey send data";
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            TextButton(onPressed:  () async {
-              await MediaStreamService.record();
-            }, child: Text('Start recording'),
-
-            ),
-          ],
-        ),
+      backgroundColor: Colors.transparent,
+      body: Column(
+        children: [
+          TextButton(onPressed: (){FlutterOverlayWindow.closeOverlay(); print('--------------------------------');}, child: Text('Close')),
+          Image.asset("assets/robot.gif", width: 200, fit: BoxFit.cover)
+        ],
       ),
     );
   }
