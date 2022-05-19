@@ -3,11 +3,12 @@ import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:get/get.dart' as g;
 class ScreenService{
   static MediaStream? _localStream;
   static MediaStreamTrack? videoTrack;
   static final RTCVideoRenderer _localRenderer = RTCVideoRenderer();
-  static Size size = Size(0, 0);
+  static Size size = Size(g.Get.width, g.Get.height);
 
   static Future<void> record() async {
     await _localRenderer.initialize();

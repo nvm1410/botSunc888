@@ -29,7 +29,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  get: ^4.6.1
+  get: '4.6.1'
   http: ^0.13.4
   shared_preferences: ^2.0.13
   flutter_feathersjs:
@@ -40,6 +40,8 @@ dependencies:
   rive: ^0.8.4
   chat_bubbles: ^1.2.0
   google_ml_kit: ^0.11.0
+  path_provider: ^2.0.10
+
 
 dev_dependencies:
   flutter_test:
