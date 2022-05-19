@@ -1,7 +1,7 @@
+import 'package:bot_sunc_888/screens/bot_overlay_screen.dart';
 import 'package:bot_sunc_888/screens/home_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_overlay_window/flutter_overlay_window.dart';
-import 'package:rive/rive.dart';
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,7 +11,7 @@ Future<void> main() async {
 void overlayMain() {
   runApp(const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MyOverlaContent()
+      home: BotOverlayScreen()
   ));
 }
 
@@ -31,31 +31,3 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyOverlaContent extends StatefulWidget {
-  const MyOverlaContent({ Key? key }) : super(key: key);
-
-  @override
-  State<MyOverlaContent> createState() => _MyOverlaContentState();
-}
-
-class _MyOverlaContentState extends State<MyOverlaContent> {
-  String _dataFromApp = "Hey send data";
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: Column(
-        children: [
-          TextButton(onPressed: (){FlutterOverlayWindow.closeOverlay(); print('--------------------------------');}, child: Text('Close')),
-          Image.asset("assets/robot.gif", width: 200, fit: BoxFit.cover)
-        ],
-      ),
-    );
-  }
-}

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:bot_sunc_888/services/media_stream_service.dart';
@@ -76,17 +77,16 @@ class _HomeScreenState extends State<HomeScreen> {
               await FlutterOverlayWindow.showOverlay(
                 alignment: OverlayAlignment.topRight,
                 flag: OverlayFlag.focusPointer,
-                width: 500,
-                height: 1000,
               );
+              Timer.periodic(Duration(seconds: 3), (_){
+                var intValue = Random().nextInt(2);
+                if(intValue==0){
+                  FlutterOverlayWindow.shareData("Về chẵn");
+                } else FlutterOverlayWindow.shareData("Về lẻ");
+
+              });
             },
             child: Text('Overlay'),
-          ),
-          TextButton(
-            onPressed: () async {
-              await FlutterOverlayWindow.closeOverlay();
-            },
-            child: Text('Close Overlay'),
           ),
           Text('${count}'),
         ],

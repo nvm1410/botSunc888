@@ -38,6 +38,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_overlay_window: ^0.2.8
   rive: ^0.8.4
+  chat_bubbles: ^1.2.0
+  google_ml_kit: ^0.11.0
 
 dev_dependencies:
   flutter_test:
