@@ -18,11 +18,26 @@ class _HomeScreenState extends State<HomeScreen> {
   ByteBuffer? bytes;
   int count = 0;
   Timer? _timer;
+  bool canProcessFrame=true;
   @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
     textRecognitionService.dispose();
+  }
+  void onLatestScreenRecordFrame()async{
+    if(!canProcessFrame) return;
+    setState(() {
+      count++;
+    });
+    bytes = await ScreenService.getFrames();
+    if(bytes!.lengthInBytes!=0){
+      await textRecognitionService.processImage(bytes!);
+      setState(() {
+        bytes;
+      });
+    }
+    onLatestScreenRecordFrame();
   }
   @override
   void initState() {
@@ -48,37 +63,16 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           TextButton(
             onPressed: () async {
-              ScreenService.record();
-              _timer = Timer.periodic(Duration(seconds: 1), (timer) async{
-                setState(() {
-                  count++;
-                });
-                if(count%7==0){
-                  bytes = await ScreenService.getFrames();
-                  if(bytes!.lengthInBytes!=0){
-                    textRecognitionService.processImage(bytes!);
-                    setState(() {
-                      bytes;
-                    });
-                  }
-                }
-              });
+              await ScreenService.record();
+              onLatestScreenRecordFrame();
             },
             child: Text('Start recording'),
           ),
-          TextButton(
-            onPressed: () async {
-              bytes = await ScreenService.getFrames();
-              setState(() {
-                bytes;
-              });
-            },
-            child: Text('Capture recording'),
-          ),
+
           TextButton(
             onPressed: () async {
               ScreenService.stop();
-              _timer!.cancel();
+              canProcessFrame=false;
             },
             child: Text('Stop'),
           ),
