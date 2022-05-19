@@ -16,9 +16,12 @@ class TextRecognitionService {
   final regexGameId = RegExp(r'SD\d+-');
   bool startBet=true;
   bool stopBet=false;
+  bool? playerBetLe=null;
+  bool? gameIsLe=null;
+  bool? botSuggestLe=null;
   bool gameFinished=false;
   Rect? chanPosition=null;
-  Rect? lePosition=null
+  Rect? lePosition=null;
 
    // true
   Future<void> processImage(ByteBuffer bytes)async{
@@ -39,11 +42,12 @@ class TextRecognitionService {
     final recognizedText = await textRecognizer.processImage(inputImage);
     print('Estime: ${DateTime.now().millisecondsSinceEpoch-_curr.millisecondsSinceEpoch}');
     String text = recognizedText.text;
-    print(text);
+    // print(text);
     if(!regexGameId.hasMatch(text)) return;
     if(regexGameId.hasMatch(text)){
       // ingame
       print('đang ở trong game');
+      print('aaaaaaaaaaaaaaaaaa'+gameIsLe.toString());
       if(TiengViet.parse(text).contains('Dat cuoc')){
 
         //start bet
@@ -51,39 +55,73 @@ class TextRecognitionService {
           print('giai đoạn đặt cược');
           var intValue = Random().nextInt(2);
           if(intValue==0){
+            botSuggestLe=false;
             FlutterOverlayWindow.shareData("Về chẵn");
-          } else FlutterOverlayWindow.shareData("Về lẻ");
+          } else {
+            botSuggestLe=true;
+            FlutterOverlayWindow.shareData("Về lẻ");
+          }
           startBet=false;
         }
       } else if(TiengViet.parse(text).toLowerCase().contains('khong dat cuoc nua')){
         print('hết giai đoạn đặt cược');
         // stop bet
         stopBet=true;
-        // check neu nguoi dung khong dat cuoc vao chan hoac le
-        FlutterOverlayWindow.shareData("Để tiền ván sau");
-        gameFinished=true;
+        if(playerBetLe==null){
+          FlutterOverlayWindow.shareData("Để tiền ván sau");
+          gameFinished=true;
+          Timer(Duration(seconds: 4),(){
+            FlutterOverlayWindow.shareData('đợi ván mới nào');
+            startBet=true;
+            stopBet=false;
+            gameFinished=false;
+            chanPosition=null;
+            lePosition=null;
+            playerBetLe=null;
+            botSuggestLe=null;
+            gameIsLe=null;
+          });
+        }
+
       }
       if(!gameFinished && stopBet){
         // theo doi ket qua cuoc va lua chon cua nguoi choi
 
+        if(gameIsLe==null || playerBetLe==null || botSuggestLe==null){
 
+        } else {
+          bool isPlayerWon=(gameIsLe! && playerBetLe!)||(!gameIsLe! && !playerBetLe!);
+          bool isPlayerFollowedBot=(botSuggestLe! && playerBetLe!)||(!botSuggestLe! && !playerBetLe!);
+          if(isPlayerWon && isPlayerFollowedBot){
+            FlutterOverlayWindow.shareData("Ngon");
+          } else if(!isPlayerWon && isPlayerFollowedBot){
+            FlutterOverlayWindow.shareData("Xui thôi");
+          } else if(isPlayerWon && !isPlayerFollowedBot){
+            FlutterOverlayWindow.shareData("Hên thôi");
+          } else if(!isPlayerWon && !isPlayerFollowedBot){
+            FlutterOverlayWindow.shareData("Nói rồi mà");
+          } else {
+            FlutterOverlayWindow.shareData("...");
+          }
+          gameFinished=true;
+          // sau do 4s sẽ reset game
+          Timer(Duration(seconds: 4),(){
+            FlutterOverlayWindow.shareData('đợi ván mới nào');
+            startBet=true;
+            stopBet=false;
+            gameFinished=false;
+            chanPosition=null;
+            lePosition=null;
+            playerBetLe=null;
+            botSuggestLe=null;
+            gameIsLe=null;
+          });
+        };
         //sau khi co ket qua check ket qua
         // theo va thang
-        FlutterOverlayWindow.shareData("Ngon");
-        // theo va thua
-        FlutterOverlayWindow.shareData("Xui thôi");
-        // không theo va thang
-        FlutterOverlayWindow.shareData("Hên thôi");
-        // không theo  va thua
-        FlutterOverlayWindow.shareData("Nói rồi mà");
-        gameFinished=true;
-        // sau do 4s sẽ reset game
-        Timer(Duration(seconds: 4),(){
-          FlutterOverlayWindow.shareData('đợi ván mới nào');
-          startBet=true;
-          stopBet=false;
-          gameFinished=false;
-        });
+
+
+
       }
 
     }
@@ -93,19 +131,47 @@ class TextRecognitionService {
       if(TiengViet.parse(block.text).contains('Chan') && chanPosition==null) {
         final Rect rect = block.boundingBox;
         chanPosition=rect;
+        print('chan');
+        print(rect);
       }
+      if(TiengViet.parse(block.text).contains('Chan') && chanPosition!=null && lePosition!=null) {
+        final Rect rect = block.boundingBox;
 
-      if(TiengViet.parse(block.text).contains('Le')){
+        if((rect.top-lePosition!.top).abs()>300){
+          gameIsLe=false;
+          print('kết quả game ra chẵn');
+          print((rect.top-lePosition!.top).abs());
+        }
+      }
+      if(TiengViet.parse(block.text).contains('Le') && lePosition==null){
         final Rect rect = block.boundingBox;
         lePosition=rect;
+        print('le');
+        print(rect);
       }
+      if(TiengViet.parse(block.text).contains('Le') && lePosition!=null &&chanPosition!=null) {
+        final Rect rect = block.boundingBox;
+        print(rect.top);
+        print(chanPosition!.top);
+        if((rect.top-chanPosition!.top).abs()>300){
+          print('kết quả game ra lẻ');
+          print((rect.top-chanPosition!.top).abs());
+          gameIsLe=true;
 
-      // if(TiengViet.parse(block.text).contains('\$')){
-      //   print('người chơi có đặt cược');
-      //   final Rect rect = block.boundingBox;
-      //   print(block.text);
-      //   print(rect);
-      // }
+        }
+      }
+      if(TiengViet.parse(block.text).contains('\$')){
+        final Rect rect = block.boundingBox;
+        if(chanPosition!=null && lePosition!=null) {
+          if((rect.left-chanPosition!.right).abs()>(rect.left-lePosition!.right).abs()){
+            playerBetLe=true;
+          } else {
+            playerBetLe=false;
+          }
+        }
+
+        print(rect);
+      }
 
       // final List<Offset> cornerPoints = block.cornerPoints;
       // final String text = block.text;

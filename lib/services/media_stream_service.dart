@@ -32,6 +32,7 @@ class ScreenService{
   }
 
   static void stop(){
+
     videoTrack!.stop();
     _localStream!.removeTrack(videoTrack!);
   }

@@ -53,13 +53,17 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Column(
         children: [
-          Center(
-              child: bytes == null
-                  ? Container(
-                width: 300,
-                height: 400,
-                color: Colors.blue)
-                  : Image.memory(bytes!.asUint8List(), width: 300, height: 400,)
+          // Center(
+          //     child: bytes == null
+          //         ? Container(
+          //       width: 300,
+          //       height: 400,
+          //       color: Colors.blue)
+          //         : Image.memory(bytes!.asUint8List(), width: 300, height: 400,)
+          // ),
+          Padding(
+            padding:  EdgeInsets.symmetric(horizontal: 20.0),
+            child: Text('Hướng dẫn sử dụng:\n Bật bot rồi bấm start recording, sau đó chuyển qua màn hình game để chơi.\nKhi muốn dừng bot bấm vào Tắt bot rồi bấm vào stop'),
           ),
           TextButton(
             onPressed: () async {
@@ -78,19 +82,20 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           TextButton(
             onPressed: () async {
+              final bool status = await FlutterOverlayWindow.isPermissionGranted();
+              if(!status) await FlutterOverlayWindow.requestPermission();
               await FlutterOverlayWindow.showOverlay(
                 alignment: OverlayAlignment.topRight,
-                flag: OverlayFlag.focusPointer,
+                flag: OverlayFlag.clickThrough,
               );
-              Timer.periodic(Duration(seconds: 3), (_){
-                var intValue = Random().nextInt(2);
-                if(intValue==0){
-                  FlutterOverlayWindow.shareData("Về chẵn");
-                } else FlutterOverlayWindow.shareData("Về lẻ");
-
-              });
             },
-            child: Text('Overlay'),
+            child: Text('Bật bot'),
+          ),
+          TextButton(
+            onPressed: () async {
+              FlutterOverlayWindow.shareData('closeBot');
+            },
+            child: Text('Tắt bot'),
           ),
           Text('${count}'),
         ],

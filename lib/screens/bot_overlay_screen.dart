@@ -11,14 +11,20 @@ class BotOverlayScreen extends StatefulWidget {
 }
 
 class _BotOverlayScreenState extends State<BotOverlayScreen> {
-  String _dataFromApp = "Bắt đầu chơi";
+  String _dataFromApp = "...";
   double x=0;
   double y=0;
   handleOverlayListener(){
     FlutterOverlayWindow.overlayListener.listen((event) {
-      setState(() {
-        _dataFromApp=event;
-      });
+      if(event=='closeBot'){
+        FlutterOverlayWindow.closeOverlay();
+      }
+      else {
+        setState(() {
+          _dataFromApp=event;
+        });
+      }
+
       // print('hello world');
 
     });
@@ -40,7 +46,7 @@ class _BotOverlayScreenState extends State<BotOverlayScreen> {
     return IgnorePointer(
       ignoring: false,
       child: Scaffold(
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.transparent,
         body: InkWell(
           onTap:() async {
             await FlutterOverlayWindow.closeOverlay();
@@ -49,14 +55,14 @@ class _BotOverlayScreenState extends State<BotOverlayScreen> {
             children: [
               // TextButton(onPressed: (){FlutterOverlayWindow.closeOverlay(); print('--------------------------------');}, child: Text('Close')),
               AnimatedPositioned(
-                top: 0,
-                left: 40,
+                top: 50,
+                left: 200,
                 duration: Duration(seconds: 1),
                 child:  Image.asset("assets/robot.gif", width: 150, fit: BoxFit.cover),
               ),
               AnimatedPositioned(
-                top: 20,
-                left: 0,
+                top: 70,
+                left: 120,
                 duration: Duration(seconds: 1),
                 child: BubbleSpecialThree(
                   text: '${_dataFromApp}',
